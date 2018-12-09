@@ -1,0 +1,88 @@
+#include <iostream>
+#include <Windows.h>
+#include "soci/soci.h"
+#include "soci/odbc/soci-odbc.h"
+#include "soci/into.h"
+#include <common-tests.h>
+#include <string>
+#include <ctime>
+#include <cmath>
+
+
+// DDL Creation objects for common tests
+/*
+struct table_creator_one : public soci::tests::table_creator_base
+{
+	table_creator_one(soci::session & sql)
+		: soci::tests::table_creator_base(sql)
+	{
+		sql << "create table soci_test(id integer, val integer, c char, "
+			"str varchar(20), sh integer, ul number, d float, "
+			"num76 numeric(7,6), "
+			"tm timestamp, i1 integer, i2 integer, i3 integer, "
+			"name varchar(20))";
+	}
+};
+
+struct table_creator_two : public soci::tests::table_creator_base
+{
+	table_creator_two(soci::session & sql)
+		: soci::tests::table_creator_base(sql)
+	{
+		sql << "create table soci_test(num_float float, num_int integer,"
+			" name varchar(20), sometime datetime, chr char)";
+	}
+};
+
+struct table_creator_three : public soci::tests::table_creator_base
+{
+	table_creator_three(soci::session & sql)
+		: soci::tests::table_creator_base(sql)
+	{
+		sql << "create table soci_test(name varchar(100) not null, "
+			"phone varchar(15))";
+	}
+};
+
+struct table_creator_for_get_affected_rows : soci::tests::table_creator_base
+{
+	table_creator_for_get_affected_rows(soci::session & sql)
+		: soci::tests::table_creator_base(sql)
+	{
+		sql << "create table soci_test(val integer)";
+	}
+};
+*/
+
+
+std::string connectString;
+soci::backend_factory const &backEnd = *soci::factory_odbc();
+
+
+int main(int argc, char** argv)
+{
+	connectString = "FILEDSN=./test_odbc_access2.dsn";
+	//test_context tc(backEnd, connectString);
+	soci::session sql(backEnd, connectString);
+	int count;
+	sql << "select count(*) from LongitudesValidas", soci::into(count);
+
+	std::cout << "count=" << count << std::endl;
+
+
+
+
+#ifdef _MSC_VER
+	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_FILE);
+	_CrtSetReportFile(_CRT_ERROR, _CRTDBG_FILE_STDERR);
+#endif //_MSC_VER
+
+	return Catch::Session().run(argc, argv);
+}
+
+/*
+int main() {
+	std::cout << "Hello world" << std::endl;
+	Sleep(10000);
+}
+*/
