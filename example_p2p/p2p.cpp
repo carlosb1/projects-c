@@ -14,6 +14,9 @@ struct Node {
 	Node(const std::string & name) {
 		this->name = name;
 		this->my_id = std::hash<std::string>{}(name);
+		this->successor_id = 0;
+		this->predecessor_id = 0;
+	
 	}
 	Node() {
 		this->my_id = 0;
@@ -35,16 +38,27 @@ class App {
 		std::shared_ptr<Node> first; 
 		std::unordered_map<std::size_t,std::shared_ptr<Node>> nodes;
 	public:
+		inline std::shared_ptr<Node> getFirst() {
+			return this->first;
+		}
+		inline std::unordered_map<std::size_t,std::shared_ptr<Node>> getNodes()  {
+			return this->nodes;
+		}
 		App() {
 			//this->first =  std::make_shared<Node>();
 		
 		};
 		void join(const Node & node) {
 			auto node_to_save = std::make_shared<Node>(node);	
+			std::cout <<"##############################\n";
 			//TODO change for an empty 
 			if (!this->first.get()) {
 				this->first = node_to_save;
 				this->nodes[node.my_id] = node_to_save;
+			
+				std::clog << "my id is :"<< node_to_save->my_id << "\n";
+				std::clog << "my predecessor_id is :"<< node_to_save->predecessor_id << "\n";
+				std::clog << "my successor_id is :"<< node_to_save->successor_id << "\n";
 				return;
 			}
 			if (nodes.find(node.my_id) != nodes.end()) {
@@ -55,7 +69,8 @@ class App {
 			
 			auto found = result_search.first;
 			auto possible_successor = result_search.second;
-
+			
+			std::clog << "It founds my successor: "<< found <<"\n";
 			if (!found) {
 				assert(possible_successor->successor_id == 0);
 				possible_successor->successor_id = node_to_save->my_id;
@@ -66,12 +81,18 @@ class App {
 				if (possible_successor->predecessor_id != 0) {
 					auto predecessor_node = this->nodes[possible_successor->predecessor_id];
 					predecessor_node->successor_id = node_to_save->my_id;
+				} else {
+					this->first = node_to_save;
 				}
+				auto old_predecesor_id = possible_successor->predecessor_id;
 				possible_successor->predecessor_id = node_to_save->my_id;
-				node_to_save->predecessor_id = possible_successor->predecessor_id;
+				node_to_save->predecessor_id = old_predecesor_id;
 				node_to_save->successor_id = possible_successor->my_id;	
 			}
-
+			
+			std::clog << "my id is :"<< node_to_save->my_id << "\n";
+			std::clog << "my predecessor_id is :"<< node_to_save->predecessor_id << "\n";
+			std::clog << "my successor_id is :"<< node_to_save->successor_id << "\n";
 
 			this->nodes[node.my_id] = node_to_save;
 		}
@@ -106,6 +127,17 @@ int main () {
 	app.join(node3);	
 	app.join(node4);	
 	app.join(node5);	
+	
+	std::cout <<"@@@@@@@@@@@@@@@@@@@@@@@@@@\n";
+	auto toNode = app.getFirst();
+	bool exit = false;
+	while (!exit) {
+		std::cout << *toNode << "\n";
+		std::cout <<"--------------------------\n";
+		if (toNode->successor_id == 0) {
+			break;
+		}
+		toNode = app.getNodes()[toNode->successor_id];
+	}
 
-	std::cout << "My hash: "<< node;
 }
