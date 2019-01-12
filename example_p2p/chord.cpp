@@ -152,9 +152,6 @@ class App {
 			std::fill(node_to_update->finger_table.begin()+1, node_to_update->finger_table.end(),0);
 			auto id_to_analyse = node_to_update->my_id;
 			for (int i=1; i < 32; i++) {
-				//id_to_analyse = (id_to_analyse << 1) % (std::numeric_limits<unsigned long>::max());
-				//id_to_analyse = (((node_to_update->my_id % this->last_node_id) + 1 ) << i);
-				//TODO add search!!
 				id_to_analyse = (node_to_update->my_id + (2 << (i - 1))) %  this->last_node_id;
 
 				auto node_to_search = std::make_shared<Node>(id_to_analyse);
